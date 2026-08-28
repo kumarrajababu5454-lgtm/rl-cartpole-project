@@ -1,404 +1,523 @@
-# Reinforcement Learning CartPole with Q-Learning
+# 🤖 CartPole Reinforcement Learning Lab
 
-A lightweight Reinforcement Learning project that teaches an agent
-to balance a pole on a moving cart using the Q-Learning algorithm.
+An end-to-end Reinforcement Learning project that uses **Q-Learning** to train an agent to balance a pole on a moving cart.
 
-The project uses Gymnasium, NumPy, and Matplotlib.
+The project includes:
 
----
-
-## Project Overview
-
-In this project, an RL agent interacts with the CartPole environment.
-
-The agent:
-
-1. Observes the current state.
-2. Chooses an action.
-3. Receives a reward.
-4. Observes the next state.
-5. Updates its Q-table.
-6. Repeats this process over many episodes.
-7. Uses the learned Q-table to make decisions during evaluation.
-
-The goal is to keep the pole balanced for as many time steps as possible.
+- Q-Learning training
+- Continuous-state discretization
+- Q-table learning
+- Exploration vs exploitation
+- Model saving
+- Agent evaluation
+- Training visualization
+- Random Agent vs trained Agent comparison
+- Interactive Streamlit frontend
+- GitHub-ready project structure
 
 ---
 
-## Technologies Used
+## 🚀 Live Application
 
-- Python
-- Gymnasium
-- NumPy
-- Matplotlib
-- Q-Learning
-- Reinforcement Learning
+**Streamlit App:**  
+Add your deployed Streamlit URL here after deployment.
 
-No GPU or large deep-learning model is required.
+**GitHub Repository:**  
+https://github.com/kumarrajababu5454-lgtm/rl-cartpole-project
 
 ---
 
-## Why Q-Learning?
+# 📌 Project Overview
 
-Q-Learning is a model-free Reinforcement Learning algorithm.
+CartPole is a classic Reinforcement Learning environment.
 
-Instead of being given the correct action, the agent learns
-which actions are better by interacting with the environment.
+The objective is simple:
 
-The agent stores learned values inside a Q-table.
+> Keep the pole balanced on the cart for as long as possible.
 
-The Q-table represents:
+The agent can perform only two actions:
 
 ```text
-State + Action → Q-Value
-CartPole Environment
+0 → Move Left
+1 → Move Right
 
-CartPole provides four main state values:
+🎯 What the Agent Learns
+
+CartPole provides four values:
 
 Cart position
 Cart velocity
 Pole angle
 Pole angular velocity
 
-The environment has two possible actions:
-
-0 → Move cart left
-1 → Move cart right
-
-The agent receives a reward for keeping the pole balanced.
-
-Continuous State to Discrete State
-
-CartPole produces continuous values.
-
-Basic Q-Learning works more easily with discrete states.
-
-Therefore, the project divides each state variable into bins.
+These values are continuous.
 
 For example:
 
-Continuous value
-       ↓
-   Discretization
-       ↓
-Discrete state
-       ↓
-Q-table lookup
+Cart position = 0.12
+Cart velocity = -0.43
+Pole angle = 0.03
+Angular velocity = 0.18
 
-This allows the Q-table to store learned values for different
-combinations of states.
+Q-Learning works more conveniently with discrete states.
 
-Q-Learning Process
+Therefore, the project divides each continuous value into bins.
 
-The training process follows this loop:
+🧩 State Discretization
 
-Start Episode
-      ↓
-Observe State
-      ↓
-Choose Action
-      ↓
-Take Action
-      ↓
-Receive Reward
-      ↓
-Observe Next State
-      ↓
-Update Q-Value
-      ↓
-Repeat
-      ↓
-End Episode
-      ↓
-Start Next Episode
-Exploration vs Exploitation
+The project converts continuous values into discrete indexes.
 
-The agent uses epsilon-greedy action selection.
+For example:
 
-At the beginning:
+Continuous state
+        ↓
+[0.12, -0.43, 0.03, 0.18]
+        ↓
+Discretization
+        ↓
+(5, 4, 6, 5)
 
-epsilon = 1.0
+The resulting tuple is used as an index in the Q-table.
 
-This means the agent explores many random actions.
+📊 Q-Table
 
-As training continues, epsilon decreases.
+The Q-table stores the learned value of each possible action for each state.
 
-Eventually, the agent relies more heavily on its learned Q-values.
+The table has the structure:
+
+State 1
+State 2
+State 3
+...
+        ↓
+LEFT / RIGHT
 
 The project uses:
 
-epsilon_decay = 0.995
-epsilon_min = 0.01
-Q-Learning Update
+q_table.shape
 
-The Q-value is updated using:
+with:
 
-Q(s,a) = Q(s,a) + α[
+11 × 11 × 11 × 11 × 2
+
+The final dimension represents the two actions.
+
+🔄 Exploration vs Exploitation
+
+At the beginning of training, the agent does not know what to do.
+
+Therefore, it explores.
+
+Exploration
+    ↓
+Try random actions
+
+Later, the agent increasingly uses what it has learned.
+
+Exploitation
+    ↓
+Choose the action with the highest Q-value
+
+This behavior is controlled using epsilon.
+
+The project starts with:
+
+epsilon = 1.0
+
+and gradually reduces it.
+
+📐 Q-Learning Update
+
+The Q-value is updated using the standard Q-Learning formula:
+
+Q(s,a) ← Q(s,a) + α[
     r + γ max Q(s',a') - Q(s,a)
 ]
 
 Where:
 
-s = current state
-a = current action
-r = reward
-s' = next state
+Q(s,a) = current Q-value
+
 α = learning rate
+
+r = reward
+
 γ = discount factor
 
-The implementation uses:
+s' = next state
 
-Learning rate = 0.1
-Discount factor = 0.99
-Project Structure
+a' = next action
+
+The code implements this update directly.
+
+🏋️ Training
+
+The agent was trained for:
+
+500 episodes
+
+Important parameters:
+
+Learning rate:       0.1
+Discount factor:     0.99
+Initial epsilon:     1.0
+Epsilon decay:       0.995
+Minimum epsilon:     0.01
+Training episodes:   500
+
+The training is intentionally lightweight.
+
+No GPU is required.
+
+No large neural network is used.
+
+💾 Saved Model
+
+After training, the learned Q-table is saved as:
+
+q_table.npy
+
+This allows the trained agent to be used later without retraining.
+
+📈 Training Results
+
+Training performance is stored in:
+
+training_rewards.png
+
+The graph shows how the agent's reward changes during training.
+
+The later episodes generally show better performance than the early training episodes, although individual episodes can vary.
+
+🧪 Evaluation
+
+The trained agent is evaluated separately from training.
+
+The evaluation process:
+
+Load q_table.npy
+        ↓
+Start CartPole
+        ↓
+Choose best learned action
+        ↓
+Run episode
+        ↓
+Record score
+
+The score represents how long the pole remained balanced.
+
+🆚 Random Agent vs Q-Learning Agent
+
+The Streamlit application allows users to compare:
+
+Random Agent
+
+The Random Agent selects actions randomly.
+
+LEFT
+RIGHT
+LEFT
+LEFT
+RIGHT
+...
+
+It has no learned strategy.
+
+Trained Q-Learning Agent
+
+The trained agent uses the Q-table.
+
+Observe state
+     ↓
+Look at Q-values
+     ↓
+Choose better action
+
+This demonstrates the main idea of Reinforcement Learning:
+
+An agent can improve its behavior by learning from interaction with an environment.
+
+🖥️ Interactive Streamlit Frontend
+
+The project includes an interactive web application.
+
+The user can select:
+
+Agent
+├── Trained Q-Learning Agent
+└── Random Agent
+
+The user can also select the number of episodes.
+
+After clicking:
+
+▶ Run Agent
+
+the application displays:
+
+Average score
+Best score
+Worst score
+Average steps
+Episode results
+Performance chart
+Agent decisions
+Training history
+🖼️ Frontend Workflow
+User
+ ↓
+Streamlit Interface
+ ↓
+Select Agent
+ ↓
+Select Number of Episodes
+ ↓
+Run Agent
+ ↓
+CartPole Environment
+ ↓
+Agent Makes Decisions
+ ↓
+Results
+ ↓
+Charts + Metrics
+📁 Project Structure
 rl-cartpole-project/
 │
-├── cartpole_qlearning.py
+├── app.py
+│
 ├── q_learning.py
+│
 ├── evaluate.py
+│
+├── cartpole_qlearning.py
+│
 ├── q_table.npy
+│
 ├── training_rewards.png
+│
 ├── requirements.txt
+│
 ├── .gitignore
+│
 └── README.md
-File Explanation
-cartpole_qlearning.py
-
-A small initial test file used to verify that Gymnasium
-and the CartPole environment are working correctly.
-
-It checks:
-
-Observation Space
-Action Space
+📄 File-by-File Explanation
 q_learning.py
 
-This is the main training program.
+Main training program.
 
 It:
 
 Creates the CartPole environment.
-Converts continuous states into discrete states.
+Discretizes the state.
 Creates the Q-table.
-Uses epsilon-greedy exploration.
 Trains the agent.
 Updates Q-values.
+Stores rewards.
 Saves the trained Q-table.
-Creates a training reward graph.
 
-The trained model is saved as:
+Output:
 
 q_table.npy
 evaluate.py
 
-This file loads the trained Q-table.
+Evaluates the trained Q-Learning agent.
 
-It does not train the agent again.
+It loads the saved Q-table and runs the agent without training.
 
-Instead, it uses the learned policy to select actions.
+This separates:
+
+Training
+
+from:
+
+Evaluation
+app.py
+
+The Streamlit frontend.
+
+It loads the trained Q-table and provides an interactive interface.
+
+Users can:
+
+Select an agent.
+Select number of episodes.
+Run simulations.
+Compare performance.
+View results.
+View agent decisions.
+cartpole_qlearning.py
+
+A lightweight/basic CartPole Q-Learning implementation created during the project development.
+
+The main finalized training workflow is contained in q_learning.py.
 
 q_table.npy
-      ↓
-evaluate.py
-      ↓
-Learned policy
-      ↓
-CartPole
 
-It reports the score achieved by the agent.
+The trained Q-table.
 
-q_table.npy
+This is the learned knowledge of the agent.
 
-This file contains the trained Q-table.
-
-It represents what the agent learned during training.
-
-It can be loaded later without training the model again.
+It is loaded by the evaluation script and Streamlit application.
 
 training_rewards.png
 
-This graph shows the reward received by the agent during training.
-
-It helps visualize the learning process.
+Visualization of training performance.
 
 requirements.txt
 
-Contains the Python packages required to run the project:
+Contains the Python packages required to run the project.
 
-gymnasium
-numpy
-matplotlib
 .gitignore
 
-Prevents unnecessary local files and folders from being uploaded
-to GitHub.
+Prevents unwanted files such as Python cache files and local environment files from being committed.
 
-Installation
+🛠️ Technologies Used
+Python
+NumPy
+Pandas
+Gymnasium
+Streamlit
+Matplotlib
+Q-Learning
+Git
+GitHub
+💻 Run Locally
 
-Make sure Python is installed.
+Clone the repository:
 
-Install the required packages:
+git clone https://github.com/kumarrajababu5454-lgtm/rl-cartpole-project.git
+
+Enter the project directory:
+
+cd rl-cartpole-project
+
+Install dependencies:
 
 python -m pip install -r requirements.txt
-Train the Agent
+🏋️ Train the Agent
 
 Run:
 
 python q_learning.py
 
-The program trains for:
+This creates:
 
-500 episodes
+q_table.npy
+training_rewards.png
+🧪 Evaluate the Agent
 
-Training progress is displayed every 10 episodes.
-
-Example:
-
-Episode: 100 | Average Reward: 36.60 | Epsilon: 0.606
-Episode: 200 | Average Reward: 35.00 | Epsilon: 0.367
-Episode: 300 | Average Reward: 51.20 | Epsilon: 0.222
-Episode: 400 | Average Reward: 67.90 | Epsilon: 0.135
-Episode: 500 | Average Reward: 54.60 | Epsilon: 0.082
-
-The exact results can change because Reinforcement Learning
-contains randomness.
-
-Evaluate the Agent
-
-After training:
+Run:
 
 python evaluate.py
+🌐 Run Streamlit
 
-The program loads:
+Run:
+
+streamlit run app.py
+
+The application will open in your browser.
+
+☁️ Deployment
+
+The Streamlit frontend can be deployed using Streamlit Community Cloud.
+
+The deployed application only needs the trained:
 
 q_table.npy
 
-and evaluates the learned policy.
+It does not need to retrain the model every time a user opens the application.
 
-Example result:
+This keeps the application lightweight.
 
-Episode 1: Score = ...
-Episode 2: Score = ...
-Episode 3: Score = 37
-Episode 4: Score = 28
-Episode 5: Score = 32
+⚡ Hardware Considerations
 
-Evaluation completed!
-Average score: 30.20
-Best score: 37
-
-The exact scores may vary between runs.
-
-Training Visualization
-
-Training produces:
-
-training_rewards.png
-
-The graph shows how the reward changes across episodes.
-
-The reward does not need to increase perfectly every episode.
-
-Reinforcement Learning training can fluctuate because the agent
-continues exploring different actions.
-
-Hardware Requirements
-
-This project is intentionally lightweight.
+This project was designed to run on a normal CPU.
 
 It does not require:
 
 GPU
-PyTorch
+CUDA
 TensorFlow
-Large AI models
+PyTorch
+Large language models
 Large datasets
 
-A normal CPU-based computer can run it.
+The Q-table is relatively small and the training process is lightweight.
 
-What This Project Demonstrates
+⚠️ Limitations
+
+This implementation uses tabular Q-Learning with state discretization.
+
+CartPole actually has continuous states.
+
+Discretizing the states makes the problem manageable for a Q-table, but it also loses some information.
+
+The agent is therefore not a production-level RL system.
+
+It is primarily an educational and portfolio implementation demonstrating the fundamentals of Reinforcement Learning.
+
+🚀 Future Improvements
+
+Possible future improvements include:
+
+More efficient state discretization
+Reward analysis
+Longer training
+Better hyperparameter tuning
+Q-Learning performance comparison
+SARSA comparison
+Deep Q-Network (DQN)
+Live CartPole animation
+More detailed agent analytics
+🎓 What This Project Demonstrates
 
 This project demonstrates practical understanding of:
 
 Reinforcement Learning
-Agents and environments
-States
-Actions
-Rewards
-Q-tables
-Q-Learning
-Exploration
-Exploitation
-Epsilon-greedy strategy
-State discretization
-Model saving
-Model evaluation
-Training visualization
-End-to-End Workflow
-CartPole Environment
-        ↓
-Continuous State
-        ↓
-State Discretization
-        ↓
-Q-Table
-        ↓
-Action Selection
         ↓
 Environment
         ↓
+State
+        ↓
+Action
+        ↓
 Reward
         ↓
-Q-Table Update
+Q-Table
         ↓
-Training
+Exploration
         ↓
-Saved Q-Table
+Exploitation
+        ↓
+Learning
         ↓
 Evaluation
         ↓
-Performance Score
-Project Result
+Deployment
 
-The final system successfully trains a Reinforcement Learning
-agent to interact with the CartPole environment.
+It is an end-to-end implementation rather than only a theoretical example.
 
-The trained Q-table is saved locally and can be reused for
-evaluation without retraining.
+👨‍💻 Project Status
 
-This project is designed as a practical implementation of
-Reinforcement Learning using a lightweight Q-Learning approach.
+Completed ✅
 
-Future Improvements
+ CartPole environment
+ State discretization
+ Q-table
+ Q-Learning training
+ Exploration/exploitation
+ Model saving
+ Evaluation
+ Training visualization
+ Interactive Streamlit frontend
+ GitHub repository
+ Streamlit deployment URL
+📌 Author
 
-Possible future improvements include:
+Raja
 
-More training episodes
-Better state discretization
-Reward smoothing
-Moving-average reward visualization
-Deep Q-Network (DQN)
-Neural-network-based RL agent
-Improved evaluation
-Interactive visualization
-Author
+GitHub:
 
-Built as a hands-on Reinforcement Learning project using Python
-and Gymnasium.
-
-
-Save it with **Ctrl + S**.
-
-### Your folder should now contain
-
-```text
-rl-cartpole-project/
-│
-├── cartpole_qlearning.py
-├── q_learning.py
-├── evaluate.py
-├── q_table.npy
-├── training_rewards.png
-├── requirements.txt
-├── .gitignore
-└── README.md
+https://github.com/kumarrajababu5454-lgtm
